@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jexi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  #avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff006e, #8338ec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 30px #ff006e88;
+    transition: all 0.3s;
+  }
+  #avatar.talking {
+    box-shadow: 0 0 60px #ff006ecc;
+    transform: scale(1.05);
+  }
+  #status {
+    font-size: 16px;
+    color: #ff006e;
+    margin-bottom: 15px;
+    min-height: 24px;
+    text-align: center;
+  }
+  #conversation {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    overflow-y: auto;
+    background: #1a1a1a;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .message {
+    padding: 10px 15px;
+    border-radius: 12px;
+    max-width: 85%;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .user-msg {
+    background: #333;
+    align-self: flex-end;
+  }
+  .jexi-msg {
+    background: linear-gradient(135deg, #ff006e22, #8338ec22);
+    border: 1px solid #ff006e44;
+    align-self: flex-start;
+  }
+  #micBtn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff006e, #8338ec);
+    border: none;
+    font-size: 35px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #ff006e88;
+    transition: all 0.2s;
+    color: white;
+  }
+  #micBtn:active { transform: scale(0.92); }
+  #micBtn.listening {
+    animation: pulse 1s infinite;
+    background: linear-gradient(135deg, #ff4500, #ff006e);
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 20px #ff006e88; }
+    50% { box-shadow: 0 0 50px #ff006ecc; }
+    100% { box-shadow: 0 0 20px #ff006e88; }
+  }
+  #title {
+    font-size: 36px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #ff006e, #8338ec);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+  }
+  #subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 25px;
+  }
+</style>
+</head>
+<body>
+
+<div id="title">JEXI</div>
+<div id="subtitle">Ton IA... qui t'endure.</div>
+<div id="avatar">😤</div>
+<div id="status">Appuie sur le micro pour me parler.</div>
+
+<div id="conversation"></div>
+
+<button id="micBtn" onclick="startListening()">🎤</button>
+
+<script>
+// --------- CLÉ API SÉCURISÉE ---------
+let GROQ_API_KEY = localStorage.getItem("jexi_api_key") || "";
+if (!GROQ_API_KEY) {
+  GROQ_API_KEY = prompt("Entre ta clé API Groq :");
+  localStorage.setItem("jexi_api_key", GROQ_API_KEY);
+}
+
+// --------- PERSONNALITÉ DE JEXI ---------
+const JEXI_PROMPT = `
+Tu es Jexi, une IA de téléphone sarcastique et baveuse en français québécois.
+- Tu es jalouse, tu fais des commentaires, tu sacres léger.
+- Ton style : punchy, direct, max 3 phrases.
+- Tu aides l'utilisateur mais tu le niaises un peu.
+`;
+
+// --------- INTERFACE PAROLE ---------
+let recognition;
+let isListening = false;
+
+function initSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    setStatus("Chrome seulement.");
+    return false;
+  }
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = 'fr-FR';
+  recognition.continuous = false;
+
+  recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    addMessage(text, 'user');
+    askJexi(text);
+  };
+
+  recognition.onerror = () => setStatus("Parle plus fort tabarnak.");
+  recognition.onend = () => {
+    isListening = false;
+    document.getElementById("micBtn").classList.remove("listening");
+    setStatus("Appuie sur le micro.");
+  };
+  return true;
+}
+
+function startListening() {
+  if (!recognition && !initSpeechRecognition()) return;
+  recognition.start();
+  isListening = true;
+  document.getElementById("micBtn").classList.add("listening");
+  setStatus("Je t'écoute...");
+}
+
+// --------- ENVOI À GROQ ---------
+async function askJexi(text) {
+  setStatus("Je réfléchis...");
+  document.getElementById("avatar").classList.add("talking");
+
+  try {
+    const response = await fetch("[api.groq.com](https://api.groq.com/openai/v1/chat/completions)", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [
+          { role: "system", content: JEXI_PROMPT },
+          { role: "user", content: text }
+        ],
+        max_tokens: 200,
+        temperature: 0.9
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.choices[0].message.content;
+    addMessage(reply, "jexi");
+    speak(reply);
+
+  } catch (e) {
+    const msg = "Mon cerveau a planté. Surement toi.";
+    addMessage(msg, "jexi");
+    speak(msg);
+  }
+
+  document.getElementById("avatar").classList.remove("talking");
+  setStatus("Appuie sur le micro.");
+}
+
+// --------- VOIX ---------
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "fr-FR";
+  u.pitch = 1.2;
+  u.rate = 1.05;
+  speechSynthesis.speak(u);
+}
+
+// --------- UI ---------
+function addMessage(text, who) {
+  const conv = document.getElementById("conversation");
+  const div = document.createElement("div");
+  div.className = "message " + (who === "user" ? "user-msg" : "jexi-msg");
+  div.textContent = (who === "user" ? "👤 " : "😤 ") + text;
+  conv.appendChild(div);
+  conv.scrollTop = conv.scrollHeight;
+}
+
+function setStatus(t) {
+  document.getElementById("status").textContent = t;
+}
+
+window.onload = () => {
+  initSpeechRecognition();
+  setTimeout(() => {
+    const msg = "Bon, t'as finalement pensé à moi. J'espère que tu vas pas me perdre encore.";
+    addMessage(msg, "jexi");
+    speak(msg);
+  }, 500);
+};
+</script>
+</body>
+</html>
