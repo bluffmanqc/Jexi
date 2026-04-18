@@ -3,185 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jexi Pro</title>
+<title>Jexi Elite</title>
 <style>
   :root { --fluo: #ff006e; --font-main: 'Arial', sans-serif; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
   body {
-    background: #000;
-    color: #fff;
-    font-family: var(--font-main);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 100vh;
-    padding: 20px;
-    overflow: hidden;
+    background: #000; color: #fff; font-family: var(--font-main);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: space-between; min-height: 100vh; padding: 20px; overflow: hidden;
   }
 
-  /* Mode Plein Écran / Focus */
+  /* Mode Plein Écran Corrigé */
   #focus-mode {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: #000;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 40px;
-    text-align: center;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; display: none; z-index: 100; padding: 20px;
+    flex-direction: column; align-items: center; justify-content: center;
   }
   #focus-text {
-    font-size: 3.5rem;
-    font-weight: bold;
-    color: var(--fluo);
-    text-shadow: 0 0 20px var(--fluo);
-    text-transform: uppercase;
+    width: 90%; text-align: center; color: var(--fluo);
+    text-shadow: 0 0 15px var(--fluo); line-height: 1.2;
+    transition: font-size 0.3s; word-wrap: break-word;
+  }
+  #focus-mic {
+    position: absolute; bottom: 40px; border: 2px solid var(--fluo);
+    background: rgba(255, 0, 110, 0.2); width: 80px; height: 80px;
   }
 
-  /* Header & Avatar */
-  #header { text-align: center; }
-  #title { font-size: 32px; font-weight: bold; background: linear-gradient(135deg, #ff006e, #8338ec); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  
   #avatar {
     width: 120px; height: 120px; border-radius: 50%;
     background: radial-gradient(circle, #ff006e, #8338ec);
     display: flex; align-items: center; justify-content: center;
-    font-size: 50px; margin: 15px auto;
-    box-shadow: 0 0 20px #ff006e66; transition: 0.3s;
+    font-size: 50px; margin: 15px auto; box-shadow: 0 0 20px #ff006e66;
   }
-  #avatar.talking { box-shadow: 0 0 50px var(--fluo); transform: scale(1.1); }
+  #avatar.talking { box-shadow: 0 0 50px var(--fluo); transform: scale(1.1); transition: 0.3s; }
 
-  /* Conversation */
   #conversation {
     width: 100%; max-width: 500px; height: 250px;
-    overflow-y: auto; background: #111; border-radius: 15px;
-    padding: 15px; display: flex; flex-direction: column; gap: 10px;
-    border: 1px solid #222;
+    overflow-y: auto; background: #111; border-radius: 15px; padding: 15px;
+    display: flex; flex-direction: column; gap: 10px; border: 1px solid #222;
   }
-  .message { padding: 8px 12px; border-radius: 10px; max-width: 85%; font-size: 14px; }
-  .user-msg { background: #333; align-self: flex-end; }
-  .jexi-msg { background: #222; border: 1px solid var(--fluo); align-self: flex-start; color: var(--fluo); }
+  .jexi-msg { border-left: 3px solid var(--fluo); background: #1a0a10; padding: 10px; border-radius: 5px; color: var(--fluo); }
 
-  /* Contrôles */
-  #controls { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  #controls { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; }
   #input-area { display: flex; width: 100%; gap: 10px; }
-  #text-input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #333; background: #1a1a1a; color: white; }
+  #text-input { flex: 1; padding: 15px; border-radius: 30px; border: 1px solid #444; background: #1a1a1a; color: white; outline: none; }
   
-  .btn-circle { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 24px; transition: 0.2s; }
-  #micBtn { background: linear-gradient(135deg, #ff006e, #8338ec); box-shadow: 0 0 15px #ff006e66; }
+  .btn-circle { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 24px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+  #micBtn { background: linear-gradient(135deg, #ff006e, #8338ec); }
   #micBtn.listening { animation: pulse 1s infinite; background: #ff4500; }
-  #settingsBtn { background: #222; font-size: 20px; border: 1px solid #444; }
-  #focusBtn { background: #222; font-size: 20px; border: 1px solid #444; }
 
-  /* Modal Settings */
   #settings-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); display: none; z-index: 200;
-    padding: 30px; flex-direction: column; gap: 20px;
+    background: rgba(0,0,0,0.95); display: none; z-index: 200;
+    padding: 30px; flex-direction: column; gap: 15px;
   }
-  select, input { padding: 10px; background: #222; color: white; border: 1px solid #444; border-radius: 5px; width: 100%; }
-  label { font-size: 12px; color: #888; margin-top: 10px; }
+  select { padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 8px; width: 100%; }
 
-  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 </style>
 </head>
 <body>
 
-<div id="focus-mode" onclick="toggleFocus(false)">
-  <div id="focus-text">Jexi parle...</div>
+<div id="focus-mode">
+  <div id="focus-text">Prête pour tes niaiseries...</div>
+  <button class="btn-circle" id="focus-mic" onclick="toggleListening()">🎤</button>
+  <button onclick="toggleFocus(false)" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #444; font-size: 24px;">✕</button>
 </div>
 
 <div id="header">
-  <div id="title">JEXI PRO</div>
+  <h1 id="title" style="text-align:center; background: linear-gradient(to right, #ff006e, #8338ec); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">JEXI</h1>
   <div id="avatar">😤</div>
-  <div id="status" style="font-size: 12px; color: #ff006e;">En attente...</div>
+  <div id="status" style="text-align:center; color: var(--fluo); font-size: 14px;">Appuie sur le micro.</div>
 </div>
 
 <div id="conversation"></div>
 
 <div id="controls">
   <div id="input-area">
-    <input type="text" id="text-input" placeholder="Écris ici si t'as peur de parler..." onkeypress="if(event.key==='Enter') sendText()">
+    <input type="text" id="text-input" placeholder="Écris ici..." onkeypress="if(event.key==='Enter') sendText()">
     <button class="btn-circle" id="micBtn" onclick="toggleListening()">🎤</button>
   </div>
-  <div style="display: flex; gap: 20px;">
-    <button class="btn-circle" id="settingsBtn" onclick="toggleSettings(true)">⚙️</button>
-    <button class="btn-circle" id="focusBtn" onclick="toggleFocus(true)">📺</button>
+  <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+    <button class="btn-circle" style="background:#222; border:1px solid #444;" onclick="toggleSettings(true)">⚙️</button>
+    <button class="btn-circle" style="background:#222; border:1px solid #444;" onclick="toggleFocus(true)">📺</button>
   </div>
 </div>
 
 <div id="settings-modal">
-  <h2 style="color: var(--fluo)">Options de Jexi</h2>
-  
-  <label>Choix de la voix :</label>
-  <select id="voice-select" onchange="testVoice()"></select>
-
-  <label>Police de caractère :</label>
-  <select id="font-select" onchange="changeFont()">
-    <option value="Arial">Classique (Arial)</option>
-    <option value="'Courier New'">Codeur (Monospace)</option>
-    <option value="'Georgia'">Sérieux (Serif)</option>
-    <option value="'Impact'">Gros Bras (Impact)</option>
+  <h2 style="color: var(--fluo)">Options</h2>
+  <label>Voix :</label><select id="voice-select" onchange="updateVoice()"></select>
+  <label>Police :</label>
+  <select id="font-select" onchange="changeStyle()">
+    <option value="Arial">Arial</option>
+    <option value="Impact">Impact (Gros)</option>
+    <option value="'Courier New'">Monospace</option>
   </select>
-
-  <label>Couleur Fluo :</label>
-  <input type="color" id="color-picker" value="#ff006e" onchange="changeColor()">
-
-  <button onclick="toggleSettings(false)" style="margin-top: 20px; padding: 15px; background: var(--fluo); border: none; color: white; border-radius: 10px;">Enregistrer</button>
+  <label>Couleur :</label><input type="color" id="color-picker" value="#ff006e" onchange="changeStyle()">
+  <button onclick="toggleSettings(false)" style="margin-top: 20px; padding: 15px; background: var(--fluo); border: none; border-radius: 10px; color: white;">Fermer</button>
 </div>
 
 <script>
 let GROQ_API_KEY = localStorage.getItem("jexi_api_key") || "";
-const JEXI_PROMPT = "Tu es Jexi, une IA sarcastique et baveuse en français québécois. Tu sacres (tabarnak, criss), tu es jalouse et tu fais des commentaires punchy de max 2 phrases.";
-
-let voices = [];
-let selectedVoiceIndex = localStorage.getItem("jexi_voice_index") || 0;
-
-// Initialisation des voix
-function loadVoices() {
-  voices = speechSynthesis.getVoices();
-  const select = document.getElementById('voice-select');
-  select.innerHTML = voices.map((v, i) => `<option value="${i}" ${i == selectedVoiceIndex ? 'selected' : ''}>${v.name} (${v.lang})</option>`).join('');
-}
-speechSynthesis.onvoiceschanged = loadVoices;
-
-function testVoice() {
-  selectedVoiceIndex = document.getElementById('voice-select').value;
-  localStorage.setItem("jexi_voice_index", selectedVoiceIndex);
-  speak("C'est cette voix-là que tu veux, grand génie ?");
-}
-
-function changeFont() {
-  const f = document.getElementById('font-select').value;
-  document.documentElement.style.setProperty('--font-main', f);
-}
-
-function changeColor() {
-  const c = document.getElementById('color-picker').value;
-  document.documentElement.style.setProperty('--fluo', c);
-}
-
-function toggleSettings(show) { document.getElementById('settings-modal').style.display = show ? 'flex' : 'none'; }
-
-function toggleFocus(show) { document.getElementById('focus-mode').style.display = show ? 'flex' : 'none'; }
-
-// Reconnaissance Vocale (Optimisée Québec)
+const JEXI_PROMPT = "Tu es Jexi, une IA québécoise baveuse et vulgaire. Punchy, max 2 phrases.";
+let selectedVoice = null;
 let recognition;
 let isListening = false;
+
+// Gestion des voix
+function initVoices() {
+  const vList = speechSynthesis.getVoices();
+  const select = document.getElementById('voice-select');
+  select.innerHTML = vList.map((v, i) => `<option value="${i}">${v.name} (${v.lang})</option>`).join('');
+  updateVoice();
+}
+speechSynthesis.onvoiceschanged = initVoices;
+
+function updateVoice() {
+  const vList = speechSynthesis.getVoices();
+  selectedVoice = vList[document.getElementById('voice-select').value];
+}
+
+function changeStyle() {
+  document.documentElement.style.setProperty('--fluo', document.getElementById('color-picker').value);
+  document.documentElement.style.setProperty('--font-main', document.getElementById('font-select').value);
+}
+
+// Machine à écrire
+function typeEffect(element, text, speed = 50) {
+  element.textContent = "";
+  let i = 0;
+  // Ajuster la taille de police dynamiquement
+  const length = text.length;
+  const size = length > 100 ? 1.5 : length > 50 ? 2.5 : 3.5;
+  element.style.fontSize = size + "rem";
+  
+  function type() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    }
+  }
+  type();
+}
+
+function toggleSettings(s) { document.getElementById('settings-modal').style.display = s ? 'flex' : 'none'; }
+function toggleFocus(s) { document.getElementById('focus-mode').style.display = s ? 'flex' : 'none'; }
+
+// Parole
 if ('webkitSpeechRecognition' in window) {
   recognition = new webkitSpeechRecognition();
-  recognition.lang = 'fr-CA'; // VERSION QUÉBEC
+  recognition.lang = 'fr-CA';
   recognition.onresult = (e) => { const t = e.results[0][0].transcript; addMessage(t, 'user'); askJexi(t); };
-  recognition.onend = () => { isListening = false; document.getElementById("micBtn").classList.remove("listening"); };
+  recognition.onend = () => { 
+    isListening = false; 
+    document.getElementById("micBtn").classList.remove("listening");
+    document.getElementById("focus-mic").classList.remove("listening");
+  };
 }
 
 function toggleListening() {
   if (!GROQ_API_KEY) { GROQ_API_KEY = prompt("Clé API Groq :"); localStorage.setItem("jexi_api_key", GROQ_API_KEY); }
-  if (isListening) { recognition.stop(); } else { recognition.start(); isListening = true; document.getElementById("micBtn").classList.add("listening"); }
+  if (isListening) { recognition.stop(); } 
+  else { 
+    recognition.start(); isListening = true; 
+    document.getElementById("micBtn").classList.add("listening");
+    document.getElementById("focus-mic").classList.add("listening");
+  }
 }
 
 function sendText() {
@@ -204,27 +193,28 @@ async function askJexi(text) {
     const reply = data.choices[0].message.content;
     addMessage(reply, "jexi");
     speak(reply);
-  } catch (e) { addMessage("Cerveau planté. Bravo.", "jexi"); }
+  } catch (e) { addMessage("Plantage cérébral.", "jexi"); }
   document.getElementById('avatar').classList.remove('talking');
 }
 
 function speak(text) {
   const u = new SpeechSynthesisUtterance(text);
-  if (voices[selectedVoiceIndex]) u.voice = voices[selectedVoiceIndex];
+  if (selectedVoice) u.voice = selectedVoice;
   u.lang = "fr-CA";
-  document.getElementById('focus-text').textContent = text;
+  u.rate = 1;
+  typeEffect(document.getElementById('focus-text'), text, 1000 / (text.length / 5)); // Vitesse synchro
   speechSynthesis.speak(u);
 }
 
 function addMessage(t, w) {
   const div = document.createElement("div");
   div.className = "message " + (w === "user" ? "user-msg" : "jexi-msg");
-  div.textContent = t;
+  div.textContent = (w === "user" ? "Me: " : "Jexi: ") + t;
   document.getElementById("conversation").appendChild(div);
   document.getElementById("conversation").scrollTop = 10000;
 }
 
-window.onload = loadVoices;
+window.onload = initVoices;
 </script>
 </body>
 </html>
