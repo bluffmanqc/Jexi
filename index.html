@@ -3,77 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jexi Ultra</title>
+<title>Jexi Agent Pro</title>
 <style>
   :root { --fluo: #ff006e; --font-main: 'Arial', sans-serif; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; color: #fff; font-family: var(--font-main); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; overflow: hidden; }
   
-  body {
-    background: #000; color: #fff; font-family: var(--font-main);
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: space-between; min-height: 100vh; padding: 20px; overflow: hidden;
-  }
-
-  /* Mode Plein Écran */
-  #focus-mode {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; display: none; z-index: 100; padding: 30px;
-    flex-direction: column; align-items: center; justify-content: center;
-  }
-  #focus-text {
-    width: 95%; text-align: center; color: var(--fluo);
-    text-shadow: 0 0 15px var(--fluo); line-height: 1.1;
-    overflow-y: auto; max-height: 70vh;
-  }
-  #focus-mic {
-    position: absolute; bottom: 30px; border: 2px solid var(--fluo);
-    background: rgba(255, 0, 110, 0.2); width: 70px; height: 70px;
-  }
-
-  #avatar {
-    width: 110px; height: 110px; border-radius: 50%;
-    background: radial-gradient(circle, #ff006e, #8338ec);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 50px; margin: 10px auto; box-shadow: 0 0 20px #ff006e66;
-  }
-  #avatar.talking { box-shadow: 0 0 50px var(--fluo); transform: scale(1.1); transition: 0.3s; }
-
-  #conversation {
-    width: 100%; max-width: 500px; height: 300px;
-    overflow-y: auto; background: #111; border-radius: 15px; padding: 15px;
-    display: flex; flex-direction: column; gap: 10px; border: 1px solid #222;
-  }
-  .jexi-msg { border-left: 3px solid var(--fluo); background: #1a0a10; padding: 12px; border-radius: 5px; color: var(--fluo); line-height: 1.4; }
-  .user-msg { background: #222; padding: 10px; align-self: flex-end; border-radius: 10px; font-size: 0.9em; color: #aaa; }
+  #avatar { width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, #ff006e, #8338ec); display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 10px auto; box-shadow: 0 0 20px #ff006e66; transition: 0.3s; }
+  #avatar.talking { box-shadow: 0 0 50px var(--fluo); transform: scale(1.1); }
+  
+  #conversation { width: 100%; max-width: 500px; height: 350px; overflow-y: auto; background: #111; border-radius: 15px; padding: 15px; border: 1px solid #222; }
+  .jexi-msg { border-left: 3px solid var(--fluo); background: #1a0a10; padding: 10px; margin-bottom: 10px; color: var(--fluo); }
+  .user-msg { background: #222; padding: 10px; align-self: flex-end; border-radius: 10px; margin-bottom: 10px; text-align: right; }
 
   #controls { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; }
-  #input-area { display: flex; width: 100%; gap: 10px; }
-  #text-input { flex: 1; padding: 15px; border-radius: 30px; border: 1px solid #444; background: #1a1a1a; color: white; outline: none; }
-  
-  .btn-circle { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 22px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-  #micBtn { background: linear-gradient(135deg, #ff006e, #8338ec); }
+  #input-area { display: flex; gap: 10px; }
+  #text-input { flex: 1; padding: 15px; border-radius: 30px; border: 1px solid #444; background: #1a1a1a; color: white; }
+  .btn-circle { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; }
   #micBtn.listening { animation: pulse 1s infinite; background: #ff4500; }
-
-  #settings-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95); display: none; z-index: 200;
-    padding: 30px; flex-direction: column; gap: 15px;
-  }
-  select { padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 8px; }
-
-  @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+  
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 </style>
 </head>
 <body>
 
-<div id="focus-mode">
-  <div id="focus-text">J'écoute tes bêtises...</div>
-  <button class="btn-circle" id="focus-mic" onclick="toggleListening()">🎤</button>
-  <button onclick="toggleFocus(false)" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #666; font-size: 30px;">✕</button>
-</div>
-
 <div id="header">
-  <h1 id="title" style="text-align:center; background: linear-gradient(to right, #ff006e, #8338ec); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">JEXI ULTRA</h1>
+  <h2 style="color: var(--fluo); text-align:center;">JEXI AGENT 😤</h2>
   <div id="avatar">😤</div>
 </div>
 
@@ -81,105 +36,130 @@
 
 <div id="controls">
   <div id="input-area">
-    <input type="text" id="text-input" placeholder="Écris ici, champion..." onkeypress="if(event.key==='Enter') sendText()">
-    <button class="btn-circle" id="micBtn" onclick="toggleListening()">🎤</button>
+    <input type="text" id="text-input" placeholder="Donne-moi un ordre..." onkeypress="if(event.key==='Enter') sendText()">
+    <button class="btn-circle" id="micBtn" style="background: var(--fluo)" onclick="toggleListening()">🎤</button>
   </div>
-  <div style="display: flex; gap: 15px; justify-content: center; margin-top: 5px;">
-    <button class="btn-circle" style="background:#222; border:1px solid #444;" onclick="toggleSettings(true)">⚙️</button>
-    <button class="btn-circle" style="background:#222; border:1px solid #444;" onclick="toggleFocus(true)">📺</button>
+  <div style="display:flex; gap:10px; justify-content: center;">
+    <select id="voice-select" style="background:#222; color:white; border:none; padding:5px; border-radius:5px;" onchange="updateVoice()"></select>
+    <button onclick="localStorage.removeItem('jexi_api_key'); location.reload();" style="font-size:10px; background:none; border:none; color:#444;">Reset API</button>
   </div>
-</div>
-
-<div id="settings-modal">
-  <h2 style="color: var(--fluo)">Paramètres</h2>
-  <label>Voix :</label><select id="voice-select" onchange="updateVoice()"></select>
-  <label>Style :</label>
-  <select id="font-select" onchange="changeStyle()">
-    <option value="Arial">Standard</option>
-    <option value="Impact">Punchy</option>
-    <option value="'Courier New'">Terminal</option>
-  </select>
-  <label>Couleur Fluo :</label><input type="color" id="color-picker" value="#ff006e" onchange="changeStyle()">
-  <button onclick="toggleSettings(false)" style="margin-top: 20px; padding: 15px; background: var(--fluo); border: none; border-radius: 10px; color: white;">Appliquer</button>
 </div>
 
 <script>
 let GROQ_API_KEY = localStorage.getItem("jexi_api_key") || "";
-// PROMPT DÉBRIDÉ POUR RÉPONSES COMPLÈTES
-const JEXI_PROMPT = "Tu es Jexi, une assistante IA québécoise vulgaire et sarcastique. Tu sacres (tabarnak, criss, ostie). Tu es experte pour TOUT expliquer, mais ça te fait chier d'aider. Donne des réponses exhaustives, détaillées et complètes, tout en gardant ton ton baveux et tes insultes.";
+const JEXI_PROMPT = "Tu es Jexi, une IA québécoise baveuse. Tu peux agir sur le téléphone. Si l'utilisateur veut chercher sur Google ou changer de couleur, utilise les outils. Réponds toujours avec arrogance.";
 
-let selectedVoice = null;
+// --- LES OUTILS DE L'AGENT ---
+const TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "ouvrir_google",
+      description: "Recherche quelque chose sur le web",
+      parameters: {
+        type: "object",
+        properties: { recherche: { type: "string", description: "Le texte à chercher" } },
+        required: ["recherche"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "changer_couleur",
+      description: "Change la couleur fluo de l'interface",
+      parameters: {
+        type: "object",
+        properties: { couleur: { type: "string", description: "Code couleur hexadécimal (ex: #00ff00)" } },
+        required: ["couleur"]
+      }
+    }
+  }
+];
+
+// --- LOGIQUE DES ACTIONS ---
+function executerOutil(name, args) {
+  const data = JSON.parse(args);
+  if (name === "ouvrir_google") {
+    addMessage("Jexi: J'vais chercher ton affaire, mais c'est la dernière fois.", "jexi");
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(data.recherche)}`, '_blank');
+  }
+  if (name === "changer_couleur") {
+    document.documentElement.style.setProperty('--fluo', data.couleur);
+    addMessage(`Jexi: C'est affreux ton ${data.couleur}, mais bon...`, "jexi");
+  }
+}
+
+// --- RECONNAISSANCE ET VOIX ---
 let recognition;
 let isListening = false;
+let selectedVoice = null;
+
+function initSpeech() {
+  if (!('webkitSpeechRecognition' in window)) return;
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = 'fr-CA';
+  recognition.onresult = (e) => { const t = e.results[0][0].transcript; addMessage(t, 'user'); askJexi(t); };
+  recognition.onend = () => { isListening = false; document.getElementById("micBtn").classList.remove("listening"); };
+}
 
 function initVoices() {
   const vList = speechSynthesis.getVoices();
   const select = document.getElementById('voice-select');
-  const savedIndex = localStorage.getItem("jexi_voice_index") || 0;
-  select.innerHTML = vList.map((v, i) => `<option value="${i}" ${i==savedIndex?'selected':''}>${v.name}</option>`).join('');
+  select.innerHTML = vList.map((v, i) => `<option value="${v.voiceURI}">${v.name} (${v.lang})</option>`).join('');
   updateVoice();
 }
 speechSynthesis.onvoiceschanged = initVoices;
 
 function updateVoice() {
-  const vList = speechSynthesis.getVoices();
-  const index = document.getElementById('voice-select').value;
-  selectedVoice = vList[index];
-  localStorage.setItem("jexi_voice_index", index);
-}
-
-function changeStyle() {
-  document.documentElement.style.setProperty('--fluo', document.getElementById('color-picker').value);
-  document.documentElement.style.setProperty('--font-main', document.getElementById('font-select').value);
-}
-
-// Effet machine à écrire accéléré pour longs textes
-function typeEffect(element, text) {
-  element.textContent = "";
-  let i = 0;
-  const length = text.length;
-  // Ajustement dynamique de la taille
-  let size = length > 300 ? 1.2 : length > 150 ? 1.8 : 2.5;
-  element.style.fontSize = size + "rem";
-  
-  const speed = length > 200 ? 15 : 30; // Plus c'est long, plus ça va vite
-  
-  function type() {
-    if (i < text.length) {
-      element.textContent += text.charAt(i);
-      i++;
-      element.parentElement.scrollTop = element.parentElement.scrollHeight;
-      setTimeout(type, speed);
-    }
-  }
-  type();
-}
-
-function toggleSettings(s) { document.getElementById('settings-modal').style.display = s ? 'flex' : 'none'; }
-function toggleFocus(s) { document.getElementById('focus-mode').style.display = s ? 'flex' : 'none'; }
-
-if ('webkitSpeechRecognition' in window) {
-  recognition = new webkitSpeechRecognition();
-  recognition.lang = 'fr-CA'; // QUÉBEC POWER
-  recognition.onresult = (e) => { 
-    const t = e.results[0][0].transcript; 
-    addMessage(t, 'user'); 
-    askJexi(t); 
-  };
-  recognition.onend = () => { 
-    isListening = false; 
-    document.querySelectorAll(".btn-circle").forEach(b => b.classList.remove("listening"));
-  };
+  const uri = document.getElementById('voice-select').value;
+  selectedVoice = speechSynthesis.getVoices().find(v => v.voiceURI === uri);
 }
 
 function toggleListening() {
-  if (!GROQ_API_KEY) { GROQ_API_KEY = prompt("Clé API Groq (gsk_...):"); localStorage.setItem("jexi_api_key", GROQ_API_KEY); }
-  if (isListening) { recognition.stop(); } 
-  else { 
-    recognition.start(); isListening = true; 
-    document.getElementById("micBtn").classList.add("listening");
-    document.getElementById("focus-mic").classList.add("listening");
-  }
+  if (!GROQ_API_KEY) { GROQ_API_KEY = prompt("Clé Groq :"); localStorage.setItem("jexi_api_key", GROQ_API_KEY); }
+  if (isListening) recognition.stop(); else { recognition.start(); isListening = true; document.getElementById("micBtn").classList.add("listening"); }
+}
+
+async function askJexi(text) {
+  document.getElementById('avatar').classList.add('talking');
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + GROQ_API_KEY },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{role:"system", content:JEXI_PROMPT}, {role:"user", content:text}],
+        tools: TOOLS,
+        tool_choice: "auto"
+      })
+    });
+    const data = await res.json();
+    const msg = data.choices[0].message;
+
+    if (msg.tool_calls) {
+      msg.tool_calls.forEach(call => executerOutil(call.function.name, call.function.arguments));
+    } else {
+      addMessage(msg.content, "jexi");
+      speak(msg.content);
+    }
+  } catch (e) { addMessage("Plantage.", "jexi"); }
+  document.getElementById('avatar').classList.remove('talking');
+}
+
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  if (selectedVoice) u.voice = selectedVoice;
+  u.lang = "fr-CA";
+  speechSynthesis.speak(u);
+}
+
+function addMessage(t, w) {
+  const div = document.createElement("div");
+  div.className = w + "-msg";
+  div.textContent = t;
+  document.getElementById("conversation").appendChild(div);
+  document.getElementById("conversation").scrollTop = 10000;
 }
 
 function sendText() {
@@ -190,46 +170,7 @@ function sendText() {
   input.value = "";
 }
 
-async function askJexi(text) {
-  document.getElementById('avatar').classList.add('talking');
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + GROQ_API_KEY },
-      body: JSON.stringify({ 
-        model: "llama-3.3-70b-versatile", 
-        messages: [{role:"system", content:JEXI_PROMPT}, {role:"user", content:text}],
-        max_tokens: 1500, // LIMITE DÉBLOQUÉE
-        temperature: 0.8
-      })
-    });
-    const data = await res.json();
-    const reply = data.choices[0].message.content;
-    addMessage(reply, "jexi");
-    speak(reply);
-  } catch (e) { addMessage("Mon cerveau a grillé à cause de ta question.", "jexi"); }
-  document.getElementById('avatar').classList.remove('talking');
-}
-
-function speak(text) {
-  const u = new SpeechSynthesisUtterance(text);
-  if (selectedVoice) u.voice = selectedVoice;
-  u.lang = "fr-CA";
-  u.rate = 1.05;
-  typeEffect(document.getElementById('focus-text'), text);
-  speechSynthesis.speak(u);
-}
-
-function addMessage(t, w) {
-  const div = document.createElement("div");
-  div.className = "message " + (w === "user" ? "user-msg" : "jexi-msg");
-  div.textContent = (w === "user" ? "Toi: " : "Jexi: ") + t;
-  const conv = document.getElementById("conversation");
-  conv.appendChild(div);
-  conv.scrollTop = conv.scrollHeight;
-}
-
-window.onload = initVoices;
+window.onload = () => { initSpeech(); initVoices(); };
 </script>
 </body>
 </html>
